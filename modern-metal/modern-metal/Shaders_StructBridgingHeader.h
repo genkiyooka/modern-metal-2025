@@ -64,5 +64,11 @@ typedef NS_ENUM(EnumBackingType, ShaderBuffer)
     ShaderBufferIndex1 = 1,
 };
 
+typedef NS_ENUM(EnumBackingType, Sampler)
+{
+    SamplerIndex0 = 0,
+    SamplerIndex1 = 1,
+};
+
 #endif /* Shaders_struct_BridgingHeader_h */
 

@@ -2,10 +2,12 @@
 import MetalKit
 import simd
 
-//struct Light {
-//    var worldPosition = float3(0, 0, 0)
-//    var color = float3(0, 0, 0)
-//}
+extension Light {
+    static func construct(worldPosition: float3,color: float3) -> Light {
+    let newObject = Light(worldPosition: worldPosition, color: color)
+        return newObject
+    }
+}
 
 class Material {
     var specularColor = float3(1, 1, 1)

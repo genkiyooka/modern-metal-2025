@@ -28,7 +28,7 @@ vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
 fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
                               constant const FragmentUniforms &uniforms [[buffer(ShaderBufferIndex0)]],
                               texture2d<float, access::sample> baseColorTexture [[texture(FragmentTextureIndex0)]],
-                              sampler baseColorSampler [[sampler(0)]])
+                              sampler baseColorSampler [[sampler(SamplerIndex0)]])
 {
     float3 baseColor = baseColorTexture.sample(baseColorSampler, fragmentIn.texCoords).rgb;
     float3 specularColor = uniforms.specularColor;

@@ -7,7 +7,7 @@ import simd
 // struct FragmentUniforms;
 
 extension FragmentUniforms {
-    static func Construct(cameraWorldPosition: float3,
+    static func construct(cameraWorldPosition: float3,
             ambientLightColor: float3,
             specularColor: float3,
             specularPower: Float,
@@ -37,7 +37,7 @@ class Renderer: NSObject, MTKViewDelegate {
     var viewMatrix = matrix_identity_float4x4
     var projectionMatrix = matrix_identity_float4x4
     
-    static let fishCount = 12
+    static let fishCount = 16
 
     init(view: MTKView, device: MTLDevice) {
         self.device = device
@@ -214,7 +214,7 @@ class Renderer: NSObject, MTKViewDelegate {
             commandEncoder.setCullMode(.back)
             commandEncoder.setDepthStencilState(depthStencilState)
             commandEncoder.setRenderPipelineState(renderPipeline)
-            commandEncoder.setFragmentSamplerState(samplerState, index: 0)
+            commandEncoder.setFragmentSamplerState(samplerState, index: Sampler.index0.rawValue)
             drawNodeRecursive(scene.rootNode, parentTransform: matrix_identity_float4x4, commandEncoder: commandEncoder)
             commandEncoder.endEncoding()
             commandBuffer.present(drawable)
@@ -232,7 +232,7 @@ class Renderer: NSObject, MTKViewDelegate {
                                                 normalMatrix: modelMatrix.normalMatrix)
             commandEncoder.setVertexBytes(&vertexUniforms, length: MemoryLayout<VertexUniforms>.size, index: ShaderBuffer.index1.rawValue)
             
-            var fragmentUniforms = FragmentUniforms.Construct(cameraWorldPosition: cameraWorldPosition,
+            var fragmentUniforms = FragmentUniforms.construct(cameraWorldPosition: cameraWorldPosition,
                                                     ambientLightColor: scene.ambientLightColor,
                                                     specularColor: node.material.specularColor,
                                                     specularPower: node.material.specularPower,
