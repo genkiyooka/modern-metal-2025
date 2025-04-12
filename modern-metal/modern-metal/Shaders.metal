@@ -1,12 +1,10 @@
-
 #include <metal_stdlib>
-using namespace metal;
+#include <simd/simd.h>
 
-struct VertexIn {
-    float3 position  [[attribute(0)]];
-    float3 normal    [[attribute(1)]];
-    float2 texCoords [[attribute(2)]];
-};
+// Including header shared between this Metal shader code and Swift/C code executing Metal API commands
+#include "Shaders_StructBridgingHeader.h"
+
+using namespace metal;
 
 struct VertexOut {
     float4 position [[position]];
@@ -15,29 +13,8 @@ struct VertexOut {
     float2 texCoords;
 };
 
-struct Light {
-    float3 worldPosition;
-    float3 color;
-};
-
-struct VertexUniforms {
-    float4x4 viewProjectionMatrix;
-    float4x4 modelMatrix;
-    float3x3 normalMatrix;
-};
-
-#define LightCount 3
-
-struct FragmentUniforms {
-    float3 cameraWorldPosition;
-    float3 ambientLightColor;
-    float3 specularColor;
-    float specularPower;
-    Light lights[LightCount];
-};
-
 vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
-                             constant VertexUniforms &uniforms [[buffer(1)]])
+                             constant const VertexUniforms &uniforms [[buffer(ShaderBufferIndex1)]])
 {
     VertexOut vertexOut;
     float4 worldPosition = uniforms.modelMatrix * float4(vertexIn.position, 1);
@@ -49,8 +26,8 @@ vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
 }
 
 fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
-                              constant FragmentUniforms &uniforms [[buffer(0)]],
-                              texture2d<float, access::sample> baseColorTexture [[texture(0)]],
+                              constant const FragmentUniforms &uniforms [[buffer(ShaderBufferIndex0)]],
+                              texture2d<float, access::sample> baseColorTexture [[texture(FragmentTextureIndex0)]],
                               sampler baseColorSampler [[sampler(0)]])
 {
     float3 baseColor = baseColorTexture.sample(baseColorSampler, fragmentIn.texCoords).rgb;

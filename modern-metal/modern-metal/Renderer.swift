@@ -1,22 +1,26 @@
-
 import Foundation
 import MetalKit
 import simd
 
-struct VertexUniforms {
-    var viewProjectionMatrix: float4x4
-    var modelMatrix: float4x4
-    var normalMatrix: float3x3
-}
+// see Shaders_StructBridgingHeader.h
+// struct VertexUniforms;
+// struct FragmentUniforms;
 
-struct FragmentUniforms {
-    var cameraWorldPosition = float3(0, 0, 0)
-    var ambientLightColor = float3(0, 0, 0)
-    var specularColor = float3(1, 1, 1)
-    var specularPower = Float(1)
-    var light0 = Light()
-    var light1 = Light()
-    var light2 = Light()
+extension FragmentUniforms {
+    static func Construct(cameraWorldPosition: float3,
+            ambientLightColor: float3,
+            specularColor: float3,
+            specularPower: Float,
+            light0: Light,
+            light1: Light,
+            light2: Light) -> FragmentUniforms {
+        let newObject = FragmentUniforms(cameraWorldPosition: cameraWorldPosition,
+                                        ambientLightColor: ambientLightColor,
+                                        specularColor: specularColor,
+                                        specularPower: specularPower,
+                                        lights: (light0, light1, light2))
+        return newObject
+    }
 }
 
 class Renderer: NSObject, MTKViewDelegate {
@@ -226,21 +230,21 @@ class Renderer: NSObject, MTKViewDelegate {
             var vertexUniforms = VertexUniforms(viewProjectionMatrix: viewProjectionMatrix,
                                                 modelMatrix: modelMatrix,
                                                 normalMatrix: modelMatrix.normalMatrix)
-            commandEncoder.setVertexBytes(&vertexUniforms, length: MemoryLayout<VertexUniforms>.size, index: 1)
+            commandEncoder.setVertexBytes(&vertexUniforms, length: MemoryLayout<VertexUniforms>.size, index: ShaderBuffer.index1.rawValue)
             
-            var fragmentUniforms = FragmentUniforms(cameraWorldPosition: cameraWorldPosition,
+            var fragmentUniforms = FragmentUniforms.Construct(cameraWorldPosition: cameraWorldPosition,
                                                     ambientLightColor: scene.ambientLightColor,
                                                     specularColor: node.material.specularColor,
                                                     specularPower: node.material.specularPower,
                                                     light0: scene.lights[0],
                                                     light1: scene.lights[1],
                                                     light2: scene.lights[2])
-            commandEncoder.setFragmentBytes(&fragmentUniforms, length: MemoryLayout<FragmentUniforms>.size, index: 0)
+            commandEncoder.setFragmentBytes(&fragmentUniforms, length: MemoryLayout<FragmentUniforms>.size, index: ShaderBuffer.index0.rawValue)
 
-            commandEncoder.setFragmentTexture(baseColorTexture, index: 0)
+            commandEncoder.setFragmentTexture(baseColorTexture, index: FragmentTexture.index0.rawValue)
 
             let vertexBuffer = mesh.vertexBuffers.first!
-            commandEncoder.setVertexBuffer(vertexBuffer.buffer, offset: vertexBuffer.offset, index: 0)
+            commandEncoder.setVertexBuffer(vertexBuffer.buffer, offset: vertexBuffer.offset, index: ShaderBuffer.index0.rawValue)
             
             for submesh in mesh.submeshes {
                 let indexBuffer = submesh.indexBuffer
