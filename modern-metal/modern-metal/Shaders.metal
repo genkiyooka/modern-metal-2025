@@ -2,7 +2,7 @@
 #include <simd/simd.h>
 
 // Including header shared between this Metal shader code and Swift/C code executing Metal API commands
-#include "Shaders_StructBridgingHeader.h"
+#include "Shaders_struct_BridgingHeader.h"
 
 using namespace metal;
 
